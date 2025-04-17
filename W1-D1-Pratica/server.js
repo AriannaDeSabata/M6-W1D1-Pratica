@@ -19,7 +19,7 @@ const userSchema = new mongoose.Schema({
 })
 
 //creazione collection di nome Users + struttura
-const userModel = mongoose.model('Users', userSchema)
+const userModel = mongoose.model('Authors', userSchema)
 
 connectDB()
 
@@ -30,14 +30,14 @@ app.get('/', (req , res)=>{
 
 
 //endPoint per leggere tutti i dati
-app.get('/users', async (req , res)=>{
+app.get('/authors', async (req , res)=>{
     const users = await userModel.find()
     res.status(200).json(users)
 })
 
 
 //endPoint per leggere i dati di un singolo user tramite il recupero di un parametro
-app.get('/users/:id', async (req, res)=>{
+app.get('/authors/:id', async (req, res)=>{
     const id = req.params.id
     try{
         const user = await userModel.findById(id)
@@ -51,7 +51,7 @@ app.get('/users/:id', async (req, res)=>{
 
 
 //enPoint per salvare i dati nel db
-app.post('/users', async (req, res)=>{
+app.post('/authors', async (req, res)=>{
     //recupero l'oggetto json dal body della req
     const obj = req.body
     
@@ -66,7 +66,7 @@ app.post('/users', async (req, res)=>{
 
 
 //endPoint per modificare un'oggetto
-app.put('/users/:id', async (req, res)=>{
+app.put('/authors/:id', async (req, res)=>{
     const id = req.params.id
     const obj = req.body
     try{
@@ -79,7 +79,7 @@ app.put('/users/:id', async (req, res)=>{
 })
 
 //endPoind per eliminare un'oggetto 
-app.delete('/users/:id', async(req, res)=>{
+app.delete('/authors/:id', async(req, res)=>{
     const id = req.params.id
     try{
         await userModel.findByIdAndDelete(id)
