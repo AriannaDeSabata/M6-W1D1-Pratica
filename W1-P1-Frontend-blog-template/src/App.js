@@ -14,7 +14,6 @@ function App() {
   const [searchValue, setSearchValue] = useState("")
 
 
-
   return (
     <Router>
       <NavBar setSearchValue={setSearchValue}/>

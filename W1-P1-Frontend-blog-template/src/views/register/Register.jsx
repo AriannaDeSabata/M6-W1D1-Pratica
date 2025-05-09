@@ -5,7 +5,9 @@ import './styles.css'
 
 export default function Register() {
 
-    const url ='http://localhost:3001/authors/register'
+    const url = process.env.REACT_APP_URL
+    const [showAlertDeny, setShowAlertDeny] = useState(false)
+    const [errorMsg, setErrorMsg ] = useState("")
 
     const [userRegister, setUserRegister] = useState({
         name:'',
@@ -19,11 +21,15 @@ export default function Register() {
     const postNewUser = async()=>{
         try {
             if(!userRegister.name || !userRegister.surname ||!userRegister.date ||!userRegister.email || !userRegister.password){
-                console.log('compila tutti i campi tutti i campi')
-                //allert error
+                setShowAlertDeny(true)
+                setErrorMsg("Compila tutti i campi")
+                setTimeout(()=>{
+                  setShowAlertDeny(false)
+                },5000)
+                return
               }
 
-              const res = await fetch(url, {
+              const res = await fetch(url + "authors/register", {
                 method: 'POST',
                 body: JSON.stringify(userRegister),
                 headers: {
@@ -57,12 +63,22 @@ export default function Register() {
     
       }
     
-    
       const handleSubmit = (e)=>{
         e.preventDefault()
         postNewUser()
         console.log(userRegister)
 
+      }
+
+      const resetForm= ()=>{
+         setUserRegister({
+                  name:'',
+                  surname:'',
+                  email:'',
+                  date:'',
+                  avatar: '',
+                  password:''
+                })
       }
 
   return (
@@ -95,10 +111,19 @@ export default function Register() {
           <Form.Control type='password' name='password' value={userRegister.password} onChange={handleChange} />
         </Form.Group>
 
+        {showAlertDeny &&(
+            <p className='errorMsg'>{errorMsg}</p>
+          )}
+
         <Form.Group className="d-flex mt-3 flex-column align-items-start">
-          <Button onClick={handleSubmit}>
-            Registrati
-          </Button>
+          <div className='d-flex gap-2'>
+            <Button onClick={handleSubmit}>
+              Registrati
+            </Button>
+            <Button onClick={resetForm} className='btn-danger'>
+              Reset
+            </Button>
+          </div>
           <Link to="/login" className="link mt-2 ms-0">Hai già un'account? <span className='registerLink'>Login</span></Link>
         </Form.Group>
 

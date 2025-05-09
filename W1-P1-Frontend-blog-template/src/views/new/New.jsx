@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Button, Container, Form } from "react-bootstrap";
+import { Alert, Button, Container, Form } from "react-bootstrap";
 import { Editor } from 'react-draft-wysiwyg';
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css';
 import "./styles.css";
@@ -21,6 +21,10 @@ const NewBlogPost = props => {
     content: ""
   })
   const [text, setText] = useState("");
+  const [showAlertSuccess, setShowAlertSuccess] = useState(false)
+  const [showAlertDeny, setShowAlertDeny] = useState(false)
+  const [errorMsg, setErrorMsg ] = useState("")
+
 
   const handleChange = useCallback(value => {
     
@@ -30,7 +34,6 @@ const NewBlogPost = props => {
 
   const handleFile =(e)=>{
     setCoverFile(e.target.files[0])
-    console.log(e.target.files[0])
   }
 
   const handleChangeForm = (e)=>{
@@ -44,6 +47,7 @@ const NewBlogPost = props => {
 
     const postBlogPost= async()=>{
       try {
+
         const res = await fetch(url,{
           method:'POST',
           body: JSON.stringify(newPost),
@@ -73,16 +77,23 @@ const NewBlogPost = props => {
               })
               if(res.ok){
                 const response = await res.json()
-                console.log(response)
                 setCoverFile(null)
               }
             } catch (error) {
-              console.log(error)
+              setShowAlertDeny(true)
+              setErrorMsg("Errore durante il caricamento del file")
+              setTimeout(()=>{
+                setShowAlertDeny(false)
+              },5000)
             }
           }
          uploadFile()
         }
 
+        setShowAlertSuccess(true)
+            setTimeout(()=>{
+            setShowAlertSuccess(false)
+        },5000)
 
         setNewPost({
           category: "",
@@ -95,11 +106,13 @@ const NewBlogPost = props => {
 
 
     } catch (error) {
-      console.log(error)
+     setShowAlertDeny(true)
+     setErrorMsg("Errore di connessione")
+     setTimeout(()=>{
+      setShowAlertDeny(false)
+     },5000)
     }
     }
-
-
 
 
   const handleSubmit = (e)=>{
@@ -110,7 +123,19 @@ const NewBlogPost = props => {
 
   return (
     <Container className="new-blog-container">
-      <Form className="mt-5">
+      <h1 className="mt-5">Nuovo articolo</h1>
+      {showAlertSuccess &&(
+          <Alert className='mt-2' variant='success'>
+            Post aggiunto con successo!
+          </Alert>
+      )
+      }
+      {showAlertDeny &&(
+          <Alert className='mt-2' variant='danger'>
+          {errorMsg}  
+          </Alert>
+      )}
+      <Form className="mt-2">
         <Form.Group controlId="blog-form" className="mt-3">
           <Form.Label>Titolo</Form.Label>
           <Form.Control size="lg" placeholder="Title" name="title" onChange={handleChangeForm}/>

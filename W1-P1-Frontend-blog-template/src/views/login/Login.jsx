@@ -1,14 +1,17 @@
 import React, { useState } from 'react'
-import { Button, Container, Form } from 'react-bootstrap'
+import { Alert, Button, Container, Form } from 'react-bootstrap'
 import { Link, useNavigate } from 'react-router-dom'
 import "./styles.css";
 
 
 export default function Login() {
 
-  const url ='http://localhost:3001/authors/login'
+  const url = process.env.REACT_APP_URL
 
   const navigate = useNavigate()
+  const [showAlertDeny, setShowAlertDeny] = useState(false)
+  const [errorMsg, setErrorMsg ] = useState("")
+  
 
   const [userLogin, setUserLogin] = useState({
     email:'',
@@ -17,13 +20,18 @@ export default function Login() {
 
 
   const loginFetch = async()=>{
+
     try {
-      if(!userLogin.email || !userLogin.password){
-        console.log('compila tutti i campi tutti i campi')
-        //allert error
+        if(!userLogin.email || !userLogin.password ){
+        setShowAlertDeny(true)
+        setErrorMsg("Compila tutti i campi!")
+        setTimeout(()=>{
+          setShowAlertDeny(false)
+        },5000)
+        return
       }
 
-      const res = await fetch(url, {
+      const res = await fetch(url + "authors/login", {
         method:'POST',
         body: JSON.stringify(userLogin),
         headers: {
@@ -33,18 +41,27 @@ export default function Login() {
 
       if(res.ok){
         const data = await res.json()
-        setUserLogin({
-          email:'',
-          password:''
-        })
-
         localStorage.setItem("token", data)
         navigate('/home')
+
+      }else if(!res.ok){
+        setShowAlertDeny(true)
+        setErrorMsg("Email o password non validi")
+        setTimeout(()=>{
+          setShowAlertDeny(false)
+        },5000)
       }
 
 
     } catch (error) {
-      console.log(error)
+        if(error){
+        setShowAlertDeny(true)
+        setErrorMsg(error)
+        setTimeout(()=>{
+          setShowAlertDeny(false)
+        },5000)
+      }
+
     }
   }
 
@@ -59,8 +76,13 @@ export default function Login() {
 
   const handleSubmit = (e)=>{
     e.preventDefault()
-    console.log(userLogin)
     loginFetch()
+  }
+  const resetForm = ()=>{
+    setUserLogin({
+      email:'',
+      password:''
+    })
   }
 
   return (
@@ -77,15 +99,26 @@ export default function Login() {
           <Form.Control type='password' name='password' value={userLogin.password} onChange={handleChange}/>
         </Form.Group>
 
+        {showAlertDeny &&(
+            <p className='errorMsg'>{errorMsg}</p>
+          )}
+
         <Form.Group className="d-flex mt-3 flex-column align-items-start">
-          <Button onClick={handleSubmit}>
-            Login
-          </Button>
-          <Link to="/login" className="link my-3 ms-0">Non hai un'account? <span className='registerLink'>Registrati</span></Link>
+          <div className='d-flex gap-2'>
+            <Button onClick={handleSubmit}>
+              Login
+            </Button>
+            <Button onClick={resetForm} className='btn-danger'>
+              Reset
+            </Button>
+          </div>
+          <Link to="/register" className="link my-3 ms-0">Non hai un'account? <span className='registerLink'>Registrati</span></Link>
         </Form.Group>
+
           <a href='http://localhost:3001/auth/googleLogin' className='btnGoogle'>
           <img src='https://techdocs.akamai.com/identity-cloud/img/social-login/identity-providers/iconfinder-new-google-favicon-682665.png' className='imgGoogleLogin'/>
           Login with Google </a>
+
       </Form>
     </Container>
   )

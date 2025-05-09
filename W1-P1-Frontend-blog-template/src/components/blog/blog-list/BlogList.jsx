@@ -2,17 +2,18 @@ import React, { useEffect, useState } from "react";
 import { Col, Row } from "react-bootstrap";
 import BlogItem from "../blog-item/BlogItem";
 
+
 const BlogList = ({searchValue}) => {
 
   const keyFetch = localStorage.getItem("token")
   const [listPost, setListPost] = useState([])
-  const url = "http://localhost:3001/blogPosts"
+  const url = process.env.REACT_APP_URL
 
   useEffect(()=>{
 
     const getAllPost = async ()=>{
       try {
-        const res = await fetch(url +`/?q=${searchValue}`, {
+        const res = await fetch(url + "blogPosts"  +`/?q=${searchValue}`, {
           headers:{
             Authorization: keyFetch
           }

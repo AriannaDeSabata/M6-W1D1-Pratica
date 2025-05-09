@@ -28,14 +28,17 @@ const NavBar = ({setSearchValue}) => {
           <Navbar.Brand as={Link} to="/">
             <img className="blog-navbar-brand" alt="logo" src={logo} />
           </Navbar.Brand>
-          {token &&
-          <>
-            <Link to="/home"  className="link">Home</Link>
-            <a href="#" onClick={logOut} className="link">LogOut</a>
-          </>
-          }
-          <Link to="/login" className="link">Login</Link>
-          <Link to="/register" className="link">Register</Link>
+            {token ? (
+              <>
+                <Link to="/home" className="link">Home</Link>
+                <button onClick={logOut} className="link btn">LogOut</button>
+              </>
+            ) : (
+              <>
+                <Link to="/login" className="link">Login</Link>
+                <Link to="/register" className="link">Register</Link>
+              </>
+            )}
         </Nav>
 
         {location.pathname === '/home' &&
